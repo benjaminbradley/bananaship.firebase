@@ -32,15 +32,18 @@ function UserActions({
   return (
     <div className="UserActions">
       {currentUser != null ?
-        <button
-          onClick={doSignOut}
-        >
-          Sign out
-        </button>
+        <>
+          {currentUser?.email}
+          <Button
+            onClick={doSignOut}
+          >
+            Sign out
+          </Button>
+        </>
       :
         <>
-          <button onClick={() => navigate('/login')}>Sign in</button>
-          <button onClick={() => navigate('/register')}>Register</button>
+          <Button onClick={() => navigate('/login')}>Sign in</Button>
+          <Button onClick={() => navigate('/register')}>Register</Button>
         </>
       }
     </div>
@@ -71,6 +74,8 @@ const UserCredsForm = ({
         toast.error('Please check the Password');
       } else if(error.code === 'auth/user-not-found'){
         toast.error('Please check the Email');
+      } else {
+        toast.error('An error occurred during login: ' + error.code);
       }
     })
   };
@@ -86,6 +91,10 @@ const UserCredsForm = ({
         toast.error('Please check the Password');
       } else if(error.code === 'auth/user-not-found'){
         toast.error('Please check the Email');
+      } else if(error.code === 'auth/email-already-in-use'){
+        toast.error('That email is already registered');
+      } else {
+        toast.error('An error occurred during registration: ' + error.code);
       }
     })
   };
