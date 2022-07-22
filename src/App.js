@@ -1,4 +1,4 @@
-import React from 'react';
+import { React, useEffect } from 'react';
 import {
   Routes,
   Route,
@@ -7,7 +7,9 @@ import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+import { useNavigate } from "react-router-dom";
 import './lib/myFirebase';
+import { useUserContext } from './lib/UserContext';
 import './App.css';
 import {UserActions, UserCredsForm} from './components/UserCreds';
 import Home from './components/Home';
@@ -17,6 +19,14 @@ function Footer() {
 }
 
 function App() {
+  const { userState } = useUserContext();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!userState?.currentUser) {
+      navigate('/login');
+    }
+  }, []);
+
   return (
     <div className="App">
       <UserActions />

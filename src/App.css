@@ -37,6 +37,10 @@
   }
 }
 
+.motd {
+  font: 2em bold italic;
+}
+
 .Footer {
   height: 2em;
   background-color: #888;
