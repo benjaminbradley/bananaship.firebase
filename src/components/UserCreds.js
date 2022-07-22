@@ -10,6 +10,7 @@ import { useUserContext, setUser } from '../lib/UserContext';
 function UserActions({
 }) {
   const { userState, userDispatch } = useUserContext();
+  const [admin, setAdmin] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,10 +30,21 @@ function UserActions({
   };
 
   const currentUser = userState?.currentUser;
+  if (currentUser) {
+    currentUser.getIdTokenResult()
+    .then((idTokenResult) => {
+      // Confirm the user is an Admin.
+      if (idTokenResult?.claims?.admin) {
+        setAdmin(true);
+      }
+    });
+  }
+
   return (
     <div className="UserActions">
       {currentUser != null ?
         <>
+          {admin && '[ADMIN] '}
           {currentUser?.email}
           <Button
             onClick={doSignOut}
