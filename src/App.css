@@ -36,3 +36,10 @@
     transform: rotate(360deg);
   }
 }
+
+.Footer {
+  height: 2em;
+  background-color: #888;
+  position: absolute;
+  bottom: 0;
+}
