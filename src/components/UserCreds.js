@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { toast } from 'react-toastify';
+import { auth } from '../lib/myFirebase';
 import { useUserContext, setUser } from '../lib/UserContext';
 import { updateUser } from '../lib/myFireDB';
 
@@ -12,6 +13,20 @@ function UserActions() {
   const { userState, userDispatch } = useUserContext();
   const [admin, setAdmin] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        sessionStorage.setItem('Auth Token', user.stsTokenManager.refreshToken);
+        userDispatch(setUser(user));
+        updateUser({
+          user: user,
+          userInfo: user.metadata,
+        });
+        navigate('/home');
+      }
+    });
+  }, []);
 
   useEffect(() => {
     let authToken = sessionStorage.getItem('Auth Token')
