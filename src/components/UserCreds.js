@@ -6,9 +6,9 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { toast } from 'react-toastify';
 import { useUserContext, setUser } from '../lib/UserContext';
+import { updateUser } from '../lib/myFireDB';
 
-function UserActions({
-}) {
+function UserActions() {
   const { userState, userDispatch } = useUserContext();
   const [admin, setAdmin] = useState(false);
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ function UserActions({
   if (currentUser) {
     currentUser.getIdTokenResult()
     .then((idTokenResult) => {
-      // Confirm the user is an Admin.
+      // Check if the user is an Admin.
       if (idTokenResult?.claims?.admin) {
         setAdmin(true);
       }
@@ -44,8 +44,8 @@ function UserActions({
     <div className="UserActions">
       {currentUser != null ?
         <>
-          {admin && '[ADMIN] '}
           {currentUser?.email}
+          {admin && ' [ADMIN] '}
           <Button
             onClick={doSignOut}
           >
@@ -71,13 +71,21 @@ const UserCredsForm = ({
   const navigate = useNavigate();
   const authentication = getAuth();
 
+  const loginSuccess = (response, message) => {
+    sessionStorage.setItem('Auth Token', response._tokenResponse.refreshToken);
+    userDispatch(setUser(response.user));
+    updateUser({
+      user: response.user,
+      userInfo: response.user.metadata,
+    });
+    toast.success(message);
+    navigate('/home');
+};
+
   const doLogin = () => {
     signInWithEmailAndPassword(authentication, email, password)
     .then((response) => {
-      userDispatch(setUser(response.user));
-      toast.success('Login successful for ' + response.user.email);
-      sessionStorage.setItem('Auth Token', response._tokenResponse.refreshToken);
-      navigate('/home');
+      loginSuccess(response, 'Login successful for ' + response.user.email);
     })
     .catch((error) => {
       console.log('login error', error)
@@ -95,7 +103,7 @@ const UserCredsForm = ({
   const doRegister = () => {
     createUserWithEmailAndPassword(authentication, email, password)
     .then((response) => {
-      sessionStorage.setItem('Auth Token', response._tokenResponse.refreshToken)
+      loginSuccess(response, 'Registration & login successful for ' + response.user.email);
     })
     .catch((error) => {
       console.log('registration error', error)

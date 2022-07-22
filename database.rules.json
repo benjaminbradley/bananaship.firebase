@@ -1,10 +1,23 @@
 {
   "rules": {
     "motd": {
-      ".read": true,
-      ".write": true
+      ".read": "auth != null",
+      ".write": "auth != null"
     },
-    ".read": false,
-    ".write": false
+    "users": {
+      "$email": {
+        "useronly": {
+          ".read": "$email === auth.token.email.toLowerCase().replace('.', '_')",
+          ".write": "$email === auth.token.email.toLowerCase().replace('.', '_')"
+        }
+      }
+    },
+    "static": {
+      "public": {
+        ".read": true,
+      },
+    },
+    ".read": "auth.token.admin === true",
+    ".write": "auth.token.admin === true"
   }
 }
