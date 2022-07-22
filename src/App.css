@@ -37,6 +37,21 @@
   }
 }
 
+.UserActions {
+  text-align: left;
+  background-color: #ddd;
+}
+
+.navMenu {
+  display: inline-block;
+}
+
+.userMenu {
+  display: inline-block;
+  position: absolute;
+  right: 0;
+}
+
 .motd {
   font: 2em bold italic;
 }
@@ -46,4 +61,10 @@
   background-color: #888;
   position: absolute;
   bottom: 0;
+}
+
+.Users {
+  height: 500px;
+  width: 800px;
+  margin: 20px auto;
 }

@@ -15,11 +15,17 @@ function UserActions() {
 
   useEffect(() => {
     let authToken = sessionStorage.getItem('Auth Token')
-    if (authToken) {
-        navigate('/home')
-    }
     if (!authToken) {
         navigate('/login')
+    }
+    if (userState?.currentUser) {
+      userState.currentUser.getIdTokenResult()
+      .then((idTokenResult) => {
+        // Check if the user is an Admin.
+        if (idTokenResult?.claims?.admin) {
+          setAdmin(true);
+        }
+      });
     }
   }, [userState?.currentUser]);
 
@@ -30,34 +36,31 @@ function UserActions() {
   };
 
   const currentUser = userState?.currentUser;
-  if (currentUser) {
-    currentUser.getIdTokenResult()
-    .then((idTokenResult) => {
-      // Check if the user is an Admin.
-      if (idTokenResult?.claims?.admin) {
-        setAdmin(true);
-      }
-    });
-  }
-
   return (
     <div className="UserActions">
-      {currentUser != null ?
-        <>
-          {currentUser?.email}
-          {admin && ' [ADMIN] '}
-          <Button
-            onClick={doSignOut}
-          >
-            Sign out
-          </Button>
-        </>
-      :
-        <>
-          <Button onClick={() => navigate('/login')}>Sign in</Button>
-          <Button onClick={() => navigate('/register')}>Register</Button>
-        </>
-      }
+      <div className="navMenu">
+        {admin &&
+          <Button onClick={() => navigate('/admin/users')}>Manage Users</Button>
+        }
+      </div>
+      <div className="userMenu">
+        {currentUser != null ?
+          <>
+            {currentUser?.email}
+            {admin && ' [ADMIN] '}
+            <Button
+              onClick={doSignOut}
+            >
+              Sign out
+            </Button>
+          </>
+        :
+          <>
+            <Button onClick={() => navigate('/login')}>Sign in</Button>
+            <Button onClick={() => navigate('/register')}>Register</Button>
+          </>
+        }
+      </div>
     </div>
   );
 }

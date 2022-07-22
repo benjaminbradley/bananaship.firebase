@@ -13,6 +13,7 @@ import { useUserContext } from './lib/UserContext';
 import './App.css';
 import {UserActions, UserCredsForm} from './components/UserCreds';
 import Home from './components/Home';
+import Users from './admin/Users';
 
 function Footer() {
   return <div className='Footer'>This part will not react to firebase auth changes</div>;
@@ -38,6 +39,7 @@ function App() {
         <Route path='/' element={<div>This is a private application. Please log in to continue.</div>} />
         <Route path='/login' element={<UserCredsForm action="login" />} />
         <Route path='/register' element={<UserCredsForm action="register" />} />
+        <Route path='/admin/users' element={<Users/>} />
         <Route path='/home' element={<Home/>} />
       </Routes>
       <Footer />
