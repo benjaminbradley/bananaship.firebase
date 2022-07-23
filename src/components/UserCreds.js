@@ -1,12 +1,14 @@
 import { React, useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 import HomeIcon from '@mui/icons-material/Home';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PeopleIcon from '@mui/icons-material/People';
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { toast } from 'react-toastify';
 import { auth } from '../lib/myFirebase';
 import { useUserContext, setUser, setAdmin } from '../lib/UserContext';
@@ -25,7 +27,6 @@ function UserActions() {
           user: user,
           userInfo: user.metadata,
         });
-        navigate('/home');
       }
     });
   }, []);
@@ -47,19 +48,32 @@ function UserActions() {
   }, [userState?.currentUser]);
 
   const doSignOut = () => {
-    userDispatch(setUser(null));
-    sessionStorage.removeItem('Auth Token');
-    navigate('/login');
+    signOut(auth)
+    .then(() => {
+      userDispatch(setUser(null));
+      sessionStorage.removeItem('Auth Token');
+      navigate('/login');
+    })
+    .catch((err) => {
+      toast.error(err.message);
+    });
   };
 
   const currentUser = userState?.currentUser;
   return (
     <div className="UserActions">
       <div className="navMenu">
-        <Button
-          onClick={() => navigate('/home')}
-          startIcon={<HomeIcon/>}
-        >Home</Button>
+        <IconButton onClick={(e) => navigate('/')}>
+          <RocketLaunchIcon/>
+        </IconButton>
+        {currentUser &&
+          <>
+            <Button
+              onClick={() => navigate('/home')}
+              startIcon={<HomeIcon/>}
+            >Home</Button>
+          </>
+        }
 
         {userState?.admin &&
           <>
@@ -96,11 +110,18 @@ function UserActions() {
 const UserCredsForm = ({
   action
 }) => {
-  const { userDispatch } = useUserContext();
+  const { userState, userDispatch } = useUserContext();
   const [email,setEmail] = useState('');
   const [password,setPassword] = useState('');
   const navigate = useNavigate();
   const authentication = getAuth();
+
+  useEffect(() => {
+    if (userState?.currentUser) {
+      console.log("DEBUG: already logged in");
+      navigate('/home');
+    }
+  }, []);
 
   const loginSuccess = (response, message) => {
     sessionStorage.setItem('Auth Token', response._tokenResponse.refreshToken);

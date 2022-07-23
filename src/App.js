@@ -9,6 +9,7 @@ import 'firebase/compat/firestore';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
+import Box from '@mui/material/Box';
 import './lib/myFirebase';
 import { useUserContext } from './lib/UserContext';
 import './App.css';
@@ -22,25 +23,15 @@ function Footer() {
 }
 
 function App() {
-  const { userState } = useUserContext();
-  const location = useLocation();
-  const navigate = useNavigate();
-  useEffect(() => {
-    console.log("TRACE: App.useEffect([]): location.pathname", location.pathname);
-    if (!userState?.currentUser) {
-      navigate('/login');
-    }
-  }, []);
-
   return (
-    <div className="App">
+    <Box className="App">
       <UserActions />
-      <div className="Head">
+      <Box className="Head">
         <h1>Code name: Banana ship</h1>
         <ToastContainer />
-      </div>
+      </Box>
       <Routes>
-        <Route path='/' element={<div>This is a private application. Please log in to continue.</div>} />
+        <Route path='/' element={<Box>This is a private application. Please log in to continue.</Box>} />
         <Route path='/login' element={<UserCredsForm action="login" />} />
         <Route path='/register' element={<UserCredsForm action="register" />} />
         <Route path='/admin/users' element={<Users/>} />
@@ -48,7 +39,7 @@ function App() {
         <Route path='/users/:userId/navy' element={<ManageNavy/>} />
       </Routes>
       <Footer />
-    </div>
+    </Box>
   );
 }
 

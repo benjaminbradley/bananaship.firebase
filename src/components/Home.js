@@ -12,7 +12,6 @@ import Motd from './Motd';
 
 const Home = () => {
   const { userState } = useUserContext();
-  console.log("Home: userState", userState)
   return (
     <Box>
       <Motd/>
