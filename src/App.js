@@ -45,7 +45,7 @@ function App() {
         <Route path='/register' element={<UserCredsForm action="register" />} />
         <Route path='/admin/users' element={<Users/>} />
         <Route path='/home' element={<Home/>} />
-        <Route path='/admin/users/:userId/navy' element={<ManageNavy/>} />
+        <Route path='/users/:userId/navy' element={<ManageNavy/>} />
       </Routes>
       <Footer />
     </div>

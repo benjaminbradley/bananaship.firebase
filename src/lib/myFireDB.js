@@ -1,9 +1,9 @@
 import { db } from '../lib/myFirebase';
 import { remove, ref, update } from 'firebase/database';
 
-function cleanEmail(email) {
+export const cleanEmail = (email) => {
   return email.toLowerCase().replace('.', '_');
-}
+};
 
 export const updateUser = ({
   user,

@@ -20,8 +20,8 @@
     },
     "games": {
       "default": {
-        "$uid": {
-          ".read": "$uid === auth.uid",
+        "$email": {
+          ".read": "$email === auth.token.email.toLowerCase().replace('.', '_')",
           "navy": {
             "$unitGuid": {
             }

@@ -9,12 +9,11 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import PeopleIcon from '@mui/icons-material/People';
 import { toast } from 'react-toastify';
 import { auth } from '../lib/myFirebase';
-import { useUserContext, setUser } from '../lib/UserContext';
+import { useUserContext, setUser, setAdmin } from '../lib/UserContext';
 import { updateUser } from '../lib/myFireDB';
 
 function UserActions() {
   const { userState, userDispatch } = useUserContext();
-  const [admin, setAdmin] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,7 +40,7 @@ function UserActions() {
       .then((idTokenResult) => {
         // Check if the user is an Admin.
         if (idTokenResult?.claims?.admin) {
-          setAdmin(true);
+          userDispatch(setAdmin(true));
         }
       });
     }
@@ -62,7 +61,7 @@ function UserActions() {
           startIcon={<HomeIcon/>}
         >Home</Button>
 
-        {admin &&
+        {userState?.admin &&
           <>
             [ADMIN]
             <Button

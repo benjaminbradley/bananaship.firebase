@@ -3,12 +3,14 @@ import { createContext, useReducer, useContext } from 'react';
 // Initial state
 const initialState = {
   currentUser: null,
+  admin: false,
 };
 
 export const UserContext = createContext();
 
 export const ACTIONS = {
-  SETUSER:1
+  SETUSER:1,
+  SETADMIN:2,
 };
 
 
@@ -17,11 +19,17 @@ export function setUser(currentUser) {
   return { type: ACTIONS.SETUSER, currentUser };
 }
 
+export function setAdmin(admin) {
+  return { type: ACTIONS.SETADMIN, admin };
+}
+
 // Reducer
 export const userReducer = (state, action) => {
   switch (action.type) {
     case ACTIONS.SETUSER:
       return { ...state, currentUser: action.currentUser };
+    case ACTIONS.SETADMIN:
+      return { ...state, admin: action.admin };
     default:
       return state;
   }

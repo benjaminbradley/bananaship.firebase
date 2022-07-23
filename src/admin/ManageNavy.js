@@ -12,6 +12,7 @@ import Typography from '@mui/material/Typography';
 import { DataGrid } from '@mui/x-data-grid';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import { useUserContext } from '../lib/UserContext';
 import { modalStyle } from '../lib/styles';
 import { db } from '../lib/myFirebase';
 import { deleteUnit } from '../lib/myFireDB';
@@ -19,6 +20,7 @@ import UnitForm from './UnitForm';
 
 const ManageNavy = ({
 } = {}) => {
+  const { userState } = useUserContext();
   const [rows, setRows] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [formData, setFormData] = useState({});
@@ -88,29 +90,34 @@ const ManageNavy = ({
   const columns = [
     { field: 'name', headerName: 'Name', width: 100 },
     { field: 'position', headerName: 'Current Position', width: 170 },
-    { field: 'operations', headerName: 'Operations', width: 120,
-      renderCell: (params) => {
-        return <>
-          <Tooltip title="Delete unit and all associated data">
-            <IconButton onClick={(e) => {
-              e.stopPropagation(); // don't select this row after clicking
-              doDeleteUnit(params.row);
-            }}>
-              <DeleteIcon/>
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Edit unit">
-            <IconButton onClick={(e) => {
-                e.stopPropagation(); // don't select this row after clicking
-                doEditUnit(params.row);
-            }}>
-              <EditIcon/>
-            </IconButton>
-          </Tooltip>
-        </>;
-      }
-    },
   ];
+
+  if (userState?.admin) {
+    columns.push(
+      { field: 'operations', headerName: 'Operations', width: 120,
+        renderCell: (params) => {
+          return <>
+            <Tooltip title="Delete unit and all associated data">
+              <IconButton onClick={(e) => {
+                e.stopPropagation(); // don't select this row after clicking
+                doDeleteUnit(params.row);
+              }}>
+                <DeleteIcon/>
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Edit unit">
+              <IconButton onClick={(e) => {
+                  e.stopPropagation(); // don't select this row after clicking
+                  doEditUnit(params.row);
+              }}>
+                <EditIcon/>
+              </IconButton>
+            </Tooltip>
+          </>;
+        }
+      }
+    );
+  }
 
   return (
     <Box className='Navy'>
@@ -138,9 +145,11 @@ const ManageNavy = ({
       <Typography variant="h6" component="h2">
         {userId}'s Navy
       </Typography>
-      <Button onClick={doAddShip} startIcon={<AddCircleOutlineOutlinedIcon/>}>
-        Add ship
-      </Button>
+      {userState?.admin &&
+        <Button onClick={doAddShip} startIcon={<AddCircleOutlineOutlinedIcon/>}>
+          Add ship
+        </Button>
+      }
       <DataGrid
         rows={rows}
         columns={columns}

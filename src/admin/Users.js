@@ -106,7 +106,7 @@ const Users = () => {
           <Tooltip title="Manage Navy">
             <IconButton onClick={(e) => {
                 e.stopPropagation(); // don't select this row after clicking
-                navigate(`/admin/users/${params.id}/navy`)
+                navigate(`/users/${params.id}/navy`)
             }}>
               <RocketIcon/>
             </IconButton>
