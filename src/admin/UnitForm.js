@@ -7,11 +7,12 @@ import { saveUnit } from '../lib/myFireDB';
 
 const UnitForm = ({
   userId,
+  formData,
   closeModal,
   onSuccess,
 } = {}) => {
-  const [name, setName] = useState('');
-  const [position, setPosition] = useState('');
+  const [name, setName] = useState(formData?.name);
+  const [position, setPosition] = useState(formData?.position);
   const [isSaving, setIsSaving] = useState(false);
 
   const doSave = () => {
@@ -19,7 +20,7 @@ const UnitForm = ({
     console.log("doing save...");
     saveUnit({
       userId,
-      unitId: uuid(),
+      unitId: formData?.id || uuid(),
       unitData: {
         name,
         position,
@@ -43,7 +44,7 @@ const UnitForm = ({
         onChange={e => setPosition(e.target.value)}
       />
       <LoadingButton loading={isSaving} variant="outlined" onClick={doSave}>
-        Save
+        {formData?.id ? 'Save' : 'Add'}
       </LoadingButton>
     </Box>
   )

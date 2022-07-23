@@ -1,25 +1,28 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { set, ref, get, child, onValue, update } from 'firebase/database';
-//import EditIcon from "@mui/icons-material/Edit";
-//import TextField from '@mui/material/TextField';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from "@mui/icons-material/Edit";
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
 import Modal from '@mui/material/Modal';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { DataGrid } from '@mui/x-data-grid';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { modalStyle } from '../lib/styles';
 import { db } from '../lib/myFirebase';
+import { deleteUnit } from '../lib/myFireDB';
 import UnitForm from './UnitForm';
 
 const ManageNavy = ({
 } = {}) => {
   const [rows, setRows] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [formData, setFormData] = useState({});
   const { userId } = useParams();
-console.log("modalStyle", modalStyle)
   useEffect(() => {
     reloadNavy();
     onValue(ref(db, `games/default/${userId}/navy`), (snapshot) => {
@@ -62,12 +65,51 @@ console.log("modalStyle", modalStyle)
   }
 
   const doAddShip = () => {
+    setFormData({});
+    setModalOpen(true);
+  }
+
+  const doDeleteUnit = (row) => {
+    // eslint-disable-next-line no-restricted-globals
+    if (confirm(`Delete all data associated with unit (${row.name}) from database ?`)) {
+      deleteUnit({
+        userId,
+        unitId: row.id,
+        onSuccess: reloadNavy,
+      });
+    }
+  }
+
+  const doEditUnit = (row) => {
+    setFormData(row);
     setModalOpen(true);
   }
 
   const columns = [
     { field: 'name', headerName: 'Name', width: 100 },
     { field: 'position', headerName: 'Current Position', width: 170 },
+    { field: 'operations', headerName: 'Operations', width: 120,
+      renderCell: (params) => {
+        return <>
+          <Tooltip title="Delete unit and all associated data">
+            <IconButton onClick={(e) => {
+              e.stopPropagation(); // don't select this row after clicking
+              doDeleteUnit(params.row);
+            }}>
+              <DeleteIcon/>
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Edit unit">
+            <IconButton onClick={(e) => {
+                e.stopPropagation(); // don't select this row after clicking
+                doEditUnit(params.row);
+            }}>
+              <EditIcon/>
+            </IconButton>
+          </Tooltip>
+        </>;
+      }
+    },
   ];
 
   return (
@@ -89,6 +131,7 @@ console.log("modalStyle", modalStyle)
             userId={userId}
             closeModal={closeModal}
             onSuccess={reloadNavy}
+            formData={formData}
           />
         </Box>
       </Modal>

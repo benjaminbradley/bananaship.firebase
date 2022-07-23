@@ -63,17 +63,19 @@ function UserActions() {
         >Home</Button>
 
         {admin &&
-          <Button
-            onClick={() => navigate('/admin/users')}
-            startIcon={<PeopleIcon/>}
-          >Manage Users</Button>
+          <>
+            [ADMIN]
+            <Button
+              onClick={() => navigate('/admin/users')}
+              startIcon={<PeopleIcon/>}
+            >Manage Users</Button>
+          </>
         }
       </div>
       <div className="userMenu">
         {currentUser != null ?
           <>
             {currentUser?.email}
-            {admin && ' [ADMIN] '}
             <Button
               onClick={doSignOut}
               endIcon={<LogoutIcon/>}
