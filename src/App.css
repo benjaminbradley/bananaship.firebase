@@ -37,6 +37,13 @@
   }
 }
 
+.MuiSvgIcon-root {
+  margin: 0px 5px;
+}
+.UserActions .MuiSvgIcon-root {
+  margin: 0px;
+}
+
 .UserActions {
   text-align: left;
   background-color: #ddd;
@@ -53,7 +60,10 @@
 }
 
 .motd {
-  font: 2em bold italic;
+  font: 2em bold;
+  background-color: #3b3;
+  color: white;
+  padding: 10px;
 }
 
 .Footer {

@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import { set, ref, get, child, onValue, update } from 'firebase/database';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import CancelIcon from '@mui/icons-material/Cancel';
 import CheckIcon from '@mui/icons-material/Check';
 import EditIcon from "@mui/icons-material/Edit";
 import TextField from '@mui/material/TextField';
@@ -48,14 +51,16 @@ const Motd = () => {
   }
 
   return (
-    <div className="motd">
+    <Box className="motd">
       {isEditMode ?
         <>
           <TextField id="motd" label="Enter the new message" variant="outlined"
             value={motd}
             onChange={e => setMotd(e.target.value)}
+            sx={{width: 500}}
           />
-          <CheckIcon onClick={submitNewMotd}/>
+          <Button onClick={() => setEditMode(false)} startIcon={<CancelIcon/>}>Cancel</Button>
+          <Button onClick={submitNewMotd} startIcon={<CheckIcon/>}>Save</Button>
         </>
       :
         <>
@@ -67,7 +72,7 @@ const Motd = () => {
           <EditIcon onClick={() => setEditMode(true)}/>
         </>
       }
-    </div>
+    </Box>
   )
 };
 export default Motd;

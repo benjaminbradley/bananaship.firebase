@@ -4,6 +4,9 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } f
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import HomeIcon from '@mui/icons-material/Home';
+import LogoutIcon from '@mui/icons-material/Logout';
+import PeopleIcon from '@mui/icons-material/People';
 import { toast } from 'react-toastify';
 import { auth } from '../lib/myFirebase';
 import { useUserContext, setUser } from '../lib/UserContext';
@@ -54,8 +57,16 @@ function UserActions() {
   return (
     <div className="UserActions">
       <div className="navMenu">
+        <Button
+          onClick={() => navigate('/home')}
+          startIcon={<HomeIcon/>}
+        >Home</Button>
+
         {admin &&
-          <Button onClick={() => navigate('/admin/users')}>Manage Users</Button>
+          <Button
+            onClick={() => navigate('/admin/users')}
+            startIcon={<PeopleIcon/>}
+          >Manage Users</Button>
         }
       </div>
       <div className="userMenu">
@@ -65,6 +76,7 @@ function UserActions() {
             {admin && ' [ADMIN] '}
             <Button
               onClick={doSignOut}
+              endIcon={<LogoutIcon/>}
             >
               Sign out
             </Button>
