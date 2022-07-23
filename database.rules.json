@@ -1,5 +1,7 @@
 {
   "rules": {
+    ".read": "auth.token.admin === true",
+    ".write": "auth.token.admin === true",
     "motd": {
       ".read": "auth != null",
       ".write": "auth != null"
@@ -9,15 +11,30 @@
         "useronly": {
           ".read": "$email === auth.token.email.toLowerCase().replace('.', '_')",
           ".write": "$email === auth.token.email.toLowerCase().replace('.', '_')"
+        },
+        "public": {
+          ".read": true
+        },
+        "adminonly": {}
+      }
+    },
+    "games": {
+      "default": {
+        "$uid": {
+          ".read": "$uid === auth.uid",
+          "navy": {
+            "$unitGuid": {
+            }
+          },
+          "fleets": {
+          }
         }
       }
     },
     "static": {
       "public": {
-        ".read": true,
-      },
-    },
-    ".read": "auth.token.admin === true",
-    ".write": "auth.token.admin === true"
+        ".read": true
+      }
+    }
   }
 }

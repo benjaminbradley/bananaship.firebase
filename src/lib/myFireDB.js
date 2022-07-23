@@ -49,3 +49,22 @@ export const deleteUser = ({
     console.log("Error deleting user:", error);
   });
 };
+
+export const saveUnit = ({
+  userId,
+  unitId,
+  unitData,
+  onSuccess,
+} = {}) => {
+  update(ref(db), {
+    [`/games/default/${userId}/navy/${unitId}`]: unitData,
+  })
+  .then(() => {
+    if (onSuccess) {
+      onSuccess();
+    }
+  })
+  .catch((error) => {
+    console.log("Error saving unit:", error);
+  });
+};

@@ -2,6 +2,7 @@ import { React, useEffect } from 'react';
 import {
   Routes,
   Route,
+  useLocation,
 } from "react-router-dom";
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
@@ -14,6 +15,7 @@ import './App.css';
 import {UserActions, UserCredsForm} from './components/UserCreds';
 import Home from './components/Home';
 import Users from './admin/Users';
+import ManageNavy from './admin/ManageNavy';
 
 function Footer() {
   return <div className='Footer'>This part will not react to firebase auth changes</div>;
@@ -21,8 +23,10 @@ function Footer() {
 
 function App() {
   const { userState } = useUserContext();
+  const location = useLocation();
   const navigate = useNavigate();
   useEffect(() => {
+    console.log("TRACE: App.useEffect([]): location.pathname", location.pathname);
     if (!userState?.currentUser) {
       navigate('/login');
     }
@@ -41,6 +45,7 @@ function App() {
         <Route path='/register' element={<UserCredsForm action="register" />} />
         <Route path='/admin/users' element={<Users/>} />
         <Route path='/home' element={<Home/>} />
+        <Route path='/admin/users/:userId/navy' element={<ManageNavy/>} />
       </Routes>
       <Footer />
     </div>

@@ -73,8 +73,9 @@
   bottom: 0;
 }
 
+.Navy,
 .Users {
   height: 500px;
-  width: 800px;
+  width: 850px;
   margin: 20px auto;
 }

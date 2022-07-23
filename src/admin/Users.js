@@ -1,16 +1,21 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import { ref, get, child, onValue } from 'firebase/database';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import DeleteIcon from '@mui/icons-material/Delete';
+import RocketIcon from '@mui/icons-material/Rocket';
+import IconButton from '@mui/material/IconButton';
 import Modal from '@mui/material/Modal';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 //import EditIcon from "@mui/icons-material/Edit";
 import { DataGrid } from '@mui/x-data-grid';
 import { db } from '../lib/myFirebase';
 import { deleteUser } from '../lib/myFireDB';
+import { modalStyle } from '../lib/styles';
 import UserForm from './UserForm';
 
 function prettyDate(timestamp) {
@@ -19,21 +24,12 @@ function prettyDate(timestamp) {
   return '';
 }
 
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
 
 const Users = () => {
   const [rows, setRows] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const navigate = useNavigate();
+  console.log("modalStyle", modalStyle)
 
   const updateUsersFromData = (data) => {
     console.log("DEBUG: updateUsersFromData, got data", data);
@@ -96,12 +92,26 @@ const Users = () => {
     { field: 'email', headerName: 'E-mail', width: 300 },
     { field: 'createdAt', headerName: 'User since', width: 200 },
     { field: 'lastLoginAt', headerName: 'Last login', width: 200 },
-    { field: 'operations', headerName: 'Operations', width: 100,
+    { field: 'operations', headerName: 'Operations', width: 120,
       renderCell: (params) => {
-        return <DeleteIcon onClick={(e) => {
-          e.stopPropagation(); // don't select this row after clicking
-          doDeleteUser(params.id);
-        }}/>;
+        return <>
+          <Tooltip title="Delete all of user's data">
+            <IconButton onClick={(e) => {
+              e.stopPropagation(); // don't select this row after clicking
+              doDeleteUser(params.id);
+            }}>
+              <DeleteIcon/>
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Manage Navy">
+            <IconButton onClick={(e) => {
+                e.stopPropagation(); // don't select this row after clicking
+                navigate(`/admin/users/${params.id}/navy`)
+            }}>
+              <RocketIcon/>
+            </IconButton>
+          </Tooltip>
+        </>;
       }
     },
   ];
@@ -113,7 +123,7 @@ const Users = () => {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
+        <Box sx={modalStyle}>
           <Button onClick={closeModal} style={{float:'right'}}>
             <CloseOutlinedIcon/>
           </Button>
