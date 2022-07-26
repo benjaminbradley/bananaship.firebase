@@ -17,6 +17,7 @@ import {UserActions, UserCredsForm} from './components/UserCreds';
 import Home from './components/Home';
 import Users from './admin/Users';
 import ManageNavy from './admin/ManageNavy';
+import ManageFleets from './admin/ManageFleets';
 
 function Footer() {
   return <div className='Footer'>This part will not react to firebase auth changes</div>;
@@ -37,6 +38,7 @@ function App() {
         <Route path='/admin/users' element={<Users/>} />
         <Route path='/home' element={<Home/>} />
         <Route path='/users/:userId/navy' element={<ManageNavy/>} />
+        <Route path='/users/:userId/fleets' element={<ManageFleets/>} />
       </Routes>
       <Footer />
     </Box>

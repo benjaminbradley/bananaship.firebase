@@ -5,10 +5,24 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import ConnectingAirportsIcon from '@mui/icons-material/ConnectingAirports';
 import RocketIcon from '@mui/icons-material/Rocket';
 import { useUserContext } from '../lib/UserContext';
 import { cleanEmail } from '../lib/myFireDB';
 import Motd from './Motd';
+
+function MyListItem({path, label, icon}) {
+  return <ListItem disablePadding>
+    <Link to={path}>
+      <ListItemButton>
+        <ListItemIcon>
+          {icon}
+        </ListItemIcon>
+        <ListItemText primary={label} />
+      </ListItemButton>
+    </Link>
+  </ListItem>;
+}
 
 const Home = () => {
   const { userState } = useUserContext();
@@ -21,16 +35,16 @@ const Home = () => {
         marginTop: '50px',
       }}>
       <List>
-        <ListItem disablePadding>
-          <Link to={`/users/${cleanEmail(userState?.currentUser?.email || '')}/navy`}>
-            <ListItemButton>
-              <ListItemIcon>
-                <RocketIcon />
-              </ListItemIcon>
-              <ListItemText primary="My Navy" />
-            </ListItemButton>
-          </Link>
-        </ListItem>
+        <MyListItem
+          path={`/users/${cleanEmail(userState?.currentUser?.email || '')}/navy`}
+          label={'My Navy'}
+          icon={<RocketIcon/>}
+        />
+        <MyListItem
+          path={`/users/${cleanEmail(userState?.currentUser?.email || '')}/fleets`}
+          label={'My Fleets'}
+          icon={<ConnectingAirportsIcon/>}
+        />
       </List>
       </Box>
     </Box>

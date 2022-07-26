@@ -84,3 +84,23 @@ export const deleteUnit = ({
     console.log("Error deleting unit:", error);
   });
 };
+
+
+export const saveFleet = ({
+  userId,
+  id,
+  data,
+  onSuccess,
+} = {}) => {
+  update(ref(db), {
+    [`/games/default/${userId}/fleets/${id}`]: data,
+  })
+  .then(() => {
+    if (onSuccess) {
+      onSuccess();
+    }
+  })
+  .catch((error) => {
+    console.log("Error saving fleet:", error);
+  });
+};
