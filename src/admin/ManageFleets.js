@@ -63,7 +63,6 @@ const ManageFleets = ({
   }
 
   const convertDataToRows = (data) => {
-    console.log("DEBUG: convertDataToRows, got data", data);
     const rowData = [];
     for (const [unitGuid, unitData] of Object.entries(data)) {
       rowData.push({
@@ -71,7 +70,6 @@ const ManageFleets = ({
         id: unitGuid
       });
     }
-    console.log("DEBUG: convertDataToRows, returning rows", rowData);
     return rowData;
   };
 
