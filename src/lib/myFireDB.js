@@ -39,6 +39,10 @@ export const deleteUser = ({
   email,
   onSuccess,
 } = {}) => {
+  remove(ref(db, `/games/default/${cleanEmail(email)}`))
+  .catch((error) => {
+    console.log("Error deleting user's game data:", error);
+  });
   remove(ref(db, `/users/${cleanEmail(email)}`))
   .then(() => {
     if (onSuccess) {

@@ -89,7 +89,7 @@ const Users = () => {
 
   const columns = [
 //    { field: 'uid', headerName: 'UID' },
-    { field: 'email', headerName: 'E-mail', width: 300 },
+    { field: 'email', headerName: 'ID', width: 300 },
     { field: 'createdAt', headerName: 'User since', width: 200 },
     { field: 'lastLoginAt', headerName: 'Last login', width: 200 },
     { field: 'operations', headerName: 'Operations', width: 120,
