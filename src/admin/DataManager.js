@@ -39,7 +39,7 @@ const DataManager = ({
         setRows(rowData);
       }
     });
-  }, []);
+  }, [convertDataToRows]);
 
   const reloadData = () => {
     get(child(ref(db), dbPaths.list)).then((snapshot) => {
@@ -128,7 +128,8 @@ const DataManager = ({
             <CloseOutlinedIcon/>
           </Button>
           <Typography variant="h6" component="h2">
-            Add new {rowType}
+            {formData?.id ? 'Edit ' : 'Add new '}
+            {rowType}
           </Typography>
           <EditForm
             userId={userId}

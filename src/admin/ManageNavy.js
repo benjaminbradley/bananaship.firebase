@@ -1,16 +1,22 @@
-import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { deleteUnit } from '../lib/myFireDB';
+import { useGameContext } from '../lib/GameContext';
 import DataManager from './DataManager';
 import UnitForm from './UnitForm';
 
 const ManageNavy = ({
 } = {}) => {
+  const {gameState} = useGameContext();
   const { userId } = useParams();
   const dbPaths = {
     list: `games/default/${userId}/navy`,
+  }
+
+  function getFleetName(fleetId) {
+    const fleetName = gameState?.fleets[fleetId]?.name || fleetId;
+    return fleetName;
   }
 
   const convertDataToRows = (data) => {
@@ -18,7 +24,8 @@ const ManageNavy = ({
     for (const [unitGuid, unitData] of Object.entries(data)) {
       rowData.push({
         ...unitData,
-        id: unitGuid
+        fleetName: getFleetName(unitData.fleetId),
+        id: unitGuid,
       });
     }
     return rowData;
@@ -35,6 +42,7 @@ const ManageNavy = ({
   const columns = [
     { field: 'name', headerName: 'Name', width: 100 },
     { field: 'position', headerName: 'Current Position', width: 170 },
+    { field: 'fleetName', headerName: 'Fleet', width: 170 },
   ];
 
   return (

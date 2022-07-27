@@ -1,17 +1,14 @@
-import { React, useEffect } from 'react';
+import { React } from 'react';
 import {
   Routes,
   Route,
-  useLocation,
 } from "react-router-dom";
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
-import { useNavigate } from "react-router-dom";
 import Box from '@mui/material/Box';
 import './lib/myFirebase';
-import { useUserContext } from './lib/UserContext';
 import './App.css';
 import {UserActions, UserCredsForm} from './components/UserCreds';
 import Home from './components/Home';

@@ -5,7 +5,9 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { saveFleet } from '../lib/myFireDB';
+import { useGameContext, setFleets } from '../lib/GameContext';
+import { useUserContext } from '../lib/UserContext';
+import { saveFleet, getFleets } from '../lib/myFireDB';
 import DataManager from './DataManager';
 
 const FleetForm = ({
@@ -14,13 +16,26 @@ const FleetForm = ({
   closeModal,
   onSuccess,
 } = {}) => {
+  const { gameDispatch } = useGameContext();
+  const { userState } = useUserContext();
   const [name, setName] = useState(formData?.name);
   const [position, setPosition] = useState(formData?.position);
   const [isSaving, setIsSaving] = useState(false);
 
+  function refreshFleets() {
+    getFleets({
+      email: userState?.currentUser?.email,
+    }).then((fleets) => {
+      if (fleets && Object.keys(fleets).length) {
+        gameDispatch(setFleets(fleets));
+      }
+    }).catch((error) => {
+      console.log("Error getting fleets", error);
+    })
+  }
+
   const doSave = () => {
     setIsSaving(true);
-    console.log("doing save...");
     saveFleet({
       userId,
       id: formData?.id || uuid(),
@@ -32,6 +47,7 @@ const FleetForm = ({
         setIsSaving(false);
         closeModal();
         onSuccess();
+        refreshFleets();
       },
     });
   };

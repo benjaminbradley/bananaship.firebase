@@ -1,8 +1,8 @@
 import { db } from '../lib/myFirebase';
-import { remove, ref, update } from 'firebase/database';
+import { child, get, remove, ref, update } from 'firebase/database';
 
 export const cleanEmail = (email) => {
-  return email.toLowerCase().replace('.', '_');
+  return email.toLowerCase().replaceAll('.', '_');
 };
 
 export const updateUser = ({
@@ -84,6 +84,25 @@ export const deleteUnit = ({
     console.log("Error deleting unit:", error);
   });
 };
+
+export const fleetsPath = ({email}) => `/games/default/${cleanEmail(email)}/fleets`;
+
+export const getFleets = async ({
+  email,
+} = {}) => {
+  return get(child(ref(db), fleetsPath({email}))).then((snapshot) => {
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      if (data) {
+        return Promise.resolve(data);
+      }
+    } else {
+      return Promise.resolve([]);
+    }
+  }).catch((error) => {
+    return Promise.reject(error);
+  });
+}
 
 
 export const saveFleet = ({

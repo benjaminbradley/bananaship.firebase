@@ -12,10 +12,12 @@ import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { toast } from 'react-toastify';
 import { auth } from '../lib/myFirebase';
 import { useUserContext, setUser, setAdmin } from '../lib/UserContext';
-import { updateUser } from '../lib/myFireDB';
+import { useGameContext, setFleets } from '../lib/GameContext';
+import { updateUser, getFleets } from '../lib/myFireDB';
 
 function UserActions() {
   const { userState, userDispatch } = useUserContext();
+  const { gameDispatch } = useGameContext();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,6 +28,16 @@ function UserActions() {
         updateUser({
           user: user,
           userInfo: user.metadata,
+        });
+        // load data for current game
+        getFleets({
+          email: user.email,
+        }).then((fleets) => {
+          if (fleets && Object.keys(fleets).length) {
+            gameDispatch(setFleets(fleets));
+          }
+        }).catch((error) => {
+          console.log("Error getting fleets", error);
         });
       }
     });
