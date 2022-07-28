@@ -59,7 +59,7 @@ const UnitForm = ({
           onChange={(e) => setFleetId(e.target.value)}
         >
           <MenuItem value="">-None-</MenuItem>
-          {Object.entries(gameState?.fleets || {}).map(([fleetId, fleetData]) =>
+          {Object.entries(gameState?.fleets?.[userId] || {}).map(([fleetId, fleetData]) =>
             <MenuItem key={fleetId} value={fleetId}>{fleetData.name}</MenuItem>
           )}
         </Select>

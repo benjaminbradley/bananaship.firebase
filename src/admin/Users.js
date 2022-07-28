@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ref, get, child, onValue } from 'firebase/database';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import ConnectingAirportsIcon from '@mui/icons-material/ConnectingAirports';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -92,7 +93,7 @@ const Users = () => {
     { field: 'email', headerName: 'ID', width: 300 },
     { field: 'createdAt', headerName: 'User since', width: 200 },
     { field: 'lastLoginAt', headerName: 'Last login', width: 200 },
-    { field: 'operations', headerName: 'Operations', width: 120,
+    { field: 'operations', headerName: 'Operations', width: 200,
       renderCell: (params) => {
         return <>
           <Tooltip title="Delete all of user's data">
@@ -109,6 +110,14 @@ const Users = () => {
                 navigate(`/users/${params.id}/navy`)
             }}>
               <RocketIcon/>
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Manage Fleets">
+            <IconButton onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/users/${params.id}/fleets`)
+            }}>
+              <ConnectingAirportsIcon/>
             </IconButton>
           </Tooltip>
         </>;

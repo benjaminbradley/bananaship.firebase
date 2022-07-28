@@ -1,4 +1,5 @@
 import { createContext, useReducer, useContext } from 'react';
+import { getFleets } from '../lib/myFireDB';
 
 // Initial state
 const initialState = {
@@ -11,7 +12,6 @@ export const ACTIONS = {
   SETFLEETS:1,
 };
 
-
 // Action creators
 export function setFleets(fleets) {
   return { type: ACTIONS.SETFLEETS, fleets };
@@ -21,7 +21,21 @@ export function setFleets(fleets) {
 export const gameReducer = (state, action) => {
   switch (action.type) {
     case ACTIONS.SETFLEETS:
-      return { ...state, fleets: action.fleets };
+      if (Object.keys(action.fleets).length === 1) {
+        // only one entry, update single branch only
+        const id = Object.keys(action.fleets)[0];
+        const newState = {
+          ...state,
+          fleets: {
+            ...state.fleets,
+            [id]: action.fleets[id]
+          }
+        };
+        return newState;
+      } else {
+        // multiple entries, replace all
+        return { ...state, fleets: action.fleets };
+      }
     default:
       return state;
   }
@@ -38,3 +52,18 @@ function useGameContext() {
 }
 
 export { GameProvider, useGameContext };
+
+export const refreshFleets = ({
+  email,
+  gameDispatch,
+}) => {
+  getFleets({
+    email,
+  }).then((fleets) => {
+    if (fleets && Object.keys(fleets).length) {
+      gameDispatch(setFleets(fleets));
+    }
+  }).catch((error) => {
+    console.log("Error getting fleets", error);
+  })
+};

@@ -15,7 +15,7 @@ const ManageNavy = ({
   }
 
   function getFleetName(fleetId) {
-    const fleetName = gameState?.fleets[fleetId]?.name || fleetId;
+    const fleetName = gameState?.fleets?.[userId]?.[fleetId]?.name || fleetId;
     return fleetName;
   }
 

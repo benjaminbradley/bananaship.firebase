@@ -12,8 +12,8 @@ import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { toast } from 'react-toastify';
 import { auth } from '../lib/myFirebase';
 import { useUserContext, setUser, setAdmin } from '../lib/UserContext';
-import { useGameContext, setFleets } from '../lib/GameContext';
-import { updateUser, getFleets } from '../lib/myFireDB';
+import { useGameContext, refreshFleets } from '../lib/GameContext';
+import { updateUser } from '../lib/myFireDB';
 
 function UserActions() {
   const { userState, userDispatch } = useUserContext();
@@ -29,19 +29,9 @@ function UserActions() {
           user: user,
           userInfo: user.metadata,
         });
-        // load data for current game
-        getFleets({
-          email: user.email,
-        }).then((fleets) => {
-          if (fleets && Object.keys(fleets).length) {
-            gameDispatch(setFleets(fleets));
-          }
-        }).catch((error) => {
-          console.log("Error getting fleets", error);
-        });
       }
     });
-  }, []);
+  }, [userState?.admin]);
 
   useEffect(() => {
     let authToken = sessionStorage.getItem('Auth Token')
@@ -52,9 +42,16 @@ function UserActions() {
       userState.currentUser.getIdTokenResult()
       .then((idTokenResult) => {
         // Check if the user is an Admin.
+        let isAdmin = false;
         if (idTokenResult?.claims?.admin) {
           userDispatch(setAdmin(true));
+          isAdmin = true;
         }
+        // load data for current game
+        refreshFleets({
+          email: (isAdmin ? null : userState?.currentUser?.email),
+          gameDispatch,
+        });
       });
     }
   }, [userState?.currentUser]);

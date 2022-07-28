@@ -94,15 +94,32 @@ export const fleetsPath = ({email}) => `/games/default/${cleanEmail(email)}/flee
 export const getFleets = async ({
   email,
 } = {}) => {
-  return get(child(ref(db), fleetsPath({email}))).then((snapshot) => {
+  let path;
+  let prepData;
+  if (email) {
+    // single user
+    path = fleetsPath({email});
+    prepData = (data) => {
+      return {
+        [cleanEmail(email)]: data
+      };
+    };
+  } else {
+    // all users (admin)
+    path = `/games/default`;
+    prepData = (data) =>
+      Object.fromEntries(Object.entries(data).map(([id,data]) => [id, data.fleets]));
+    ;
+  }
+  return get(child(ref(db), path)).then((snapshot) => {
     if (snapshot.exists()) {
       const data = snapshot.val();
       if (data) {
-        return Promise.resolve(data);
+        const finalData = prepData(data);
+        return Promise.resolve(finalData);
       }
-    } else {
-      return Promise.resolve([]);
     }
+    return Promise.resolve([]);
   }).catch((error) => {
     return Promise.reject(error);
   });

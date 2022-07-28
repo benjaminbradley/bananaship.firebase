@@ -5,9 +5,9 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { useGameContext, setFleets } from '../lib/GameContext';
+import { useGameContext, refreshFleets } from '../lib/GameContext';
 import { useUserContext } from '../lib/UserContext';
-import { saveFleet, getFleets } from '../lib/myFireDB';
+import { saveFleet } from '../lib/myFireDB';
 import DataManager from './DataManager';
 
 const FleetForm = ({
@@ -22,18 +22,6 @@ const FleetForm = ({
   const [position, setPosition] = useState(formData?.position);
   const [isSaving, setIsSaving] = useState(false);
 
-  function refreshFleets() {
-    getFleets({
-      email: userState?.currentUser?.email,
-    }).then((fleets) => {
-      if (fleets && Object.keys(fleets).length) {
-        gameDispatch(setFleets(fleets));
-      }
-    }).catch((error) => {
-      console.log("Error getting fleets", error);
-    })
-  }
-
   const doSave = () => {
     setIsSaving(true);
     saveFleet({
@@ -47,7 +35,10 @@ const FleetForm = ({
         setIsSaving(false);
         closeModal();
         onSuccess();
-        refreshFleets();
+        refreshFleets({
+          email: userId,
+          gameDispatch,
+        });
       },
     });
   };
@@ -90,8 +81,8 @@ const ManageFleets = ({
   };
 
   const columns = [
-    { field: 'name', headerName: 'Name', width: 100 },
-    { field: 'position', headerName: 'Current Position', width: 170 },
+    { field: 'name', headerName: 'Name', width: 200 },
+    { field: 'position', headerName: 'Current Position', width: 150 },
   ];
 
   return (
