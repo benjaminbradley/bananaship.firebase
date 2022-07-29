@@ -9,6 +9,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PeopleIcon from '@mui/icons-material/People';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import { toast } from 'react-toastify';
 import { auth } from '../lib/myFirebase';
 import { useUserContext, setUser, setAdmin } from '../lib/UserContext';
@@ -86,11 +87,15 @@ function UserActions() {
 
         {userState?.admin &&
           <>
-            [ADMIN]
+            [ADMIN] Manage:
+            <Button
+              onClick={() => navigate('/admin/game')}
+              startIcon={<SportsEsportsIcon/>}
+            >Game</Button>
             <Button
               onClick={() => navigate('/admin/users')}
               startIcon={<PeopleIcon/>}
-            >Manage Users</Button>
+            >Users</Button>
           </>
         }
       </div>

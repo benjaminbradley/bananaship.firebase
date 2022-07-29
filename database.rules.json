@@ -20,6 +20,11 @@
     },
     "games": {
       "default": {
+        "currentTurn": {
+          "public": {
+            ".read": true
+          }
+        },
         "$email": {
           ".read": "$email === auth.token.email.toLowerCase().replace('.', '_')",
           "navy": {

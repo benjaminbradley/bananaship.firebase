@@ -12,6 +12,7 @@ import './lib/myFirebase';
 import './App.css';
 import {UserActions, UserCredsForm} from './components/UserCreds';
 import Home from './components/Home';
+import GameDetail from './admin/GameDetail';
 import Users from './admin/Users';
 import ManageNavy from './admin/ManageNavy';
 import ManageFleets from './admin/ManageFleets';
@@ -32,6 +33,7 @@ function App() {
         <Route path='/' element={<Box>This is a private application. Please log in to continue.</Box>} />
         <Route path='/login' element={<UserCredsForm action="login" />} />
         <Route path='/register' element={<UserCredsForm action="register" />} />
+        <Route path='/admin/game' element={<GameDetail/>} />
         <Route path='/admin/users' element={<Users/>} />
         <Route path='/home' element={<Home/>} />
         <Route path='/users/:userId/navy' element={<ManageNavy/>} />

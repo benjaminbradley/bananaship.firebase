@@ -70,6 +70,14 @@
   padding: 10px;
 }
 
+.GameDetail {
+  padding: 10px;
+  width: 50%;
+  margin: auto;
+  border: 1px solid #888;
+  box-shadow: 7px 7px 5px #aaa;
+}
+
 .Footer {
   height: 2em;
   background-color: #888;
