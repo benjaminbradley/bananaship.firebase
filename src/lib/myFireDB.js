@@ -23,6 +23,15 @@ export async function getDbData({
   });
 }
 
+export async function updateDbData({
+  path,
+  data,
+}) {
+  return update(ref(db), {
+    [path]: data,
+  })
+};
+
 export const updateUser = ({
   user,
   userInfo,

@@ -15,7 +15,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { DataGrid, useGridApiContext } from '@mui/x-data-grid';
 import { modalStyle } from '../lib/styles';
-import { getDbData, getNavyPath, saveShipMovement, turnSubmissionPath } from '../lib/myFireDB';
+import { getDbData, getNavyPath, saveShipMovement, turnSubmissionPath, getTurnDetail, updateDbData } from '../lib/myFireDB';
 import { useGameContext } from '../lib/GameContext';
 import UnitForm from './UnitForm';
 
@@ -39,6 +39,15 @@ const Turn = () => {
   const [modalMode, setModalMode] = useState(MODALMODE.UNIT);
   const [formData, setFormData] = useState({});
   const [modalFleetData, setmodalFleetData] = useState([]);
+  const [turnSubmitted, setTurnSubmitted] = useState(null);
+  const [turnDetail, setTurnDetail] = useState(null);
+  const [isTurnEditable, setTurnEditable] = useState(false);
+
+  useEffect(() => {
+    getTurnDetail({turnNum})
+    .then((data) => setTurnDetail(data))
+    .catch((err) => console.log("Error getting turn detail", err));
+  }, [turnNum]);
 
   function getFleetName(fleetId) {
     const fleetName = gameState?.fleets?.[userId]?.[fleetId]?.name || fleetId;
@@ -104,6 +113,8 @@ const Turn = () => {
     })
     .then((submission) => {
       createRows(submission ? submission.shipMovements : {});
+      setTurnSubmitted(submission?.submitted);
+      setTurnEditable(!submission?.submitted && turnDetail?.public?.status === 'OPEN')
     }).catch((error) => {
       console.error('Error reading submission:', error);
     });
@@ -112,7 +123,7 @@ const Turn = () => {
   useEffect(() => {
     if (!gameState?.fleets?.[userId]) return;
     reloadData();
-  }, [gameState?.fleets?.[userId]])
+  }, [userId, gameState?.fleets?.[userId]])
 
   const closeModal = () => {
     setModalOpen(false);
@@ -158,7 +169,7 @@ const Turn = () => {
   }
 
   function savePosition(updatedRow, previousRow) {
-    if (updatedRow.endingPosition != previousRow.endingPosition) {
+    if (updatedRow.endingPosition !== previousRow.endingPosition) {
       doSaveMovement(updatedRow);
     }
     return updatedRow;
@@ -179,8 +190,6 @@ const Turn = () => {
     if(onSuccess) onSuccess();
   }
 
-  const isTurnEditable = true;
-
   const columns = [
     { field: 'type', headerName: 'Type', width: 60 },
     { field: 'name', headerName: 'Name', width: 200 },
@@ -189,11 +198,15 @@ const Turn = () => {
       editable: true,
       renderCell: (params) => <div className="MuiDataGrid-cellContent">
           {params.row.endingPosition}
-          <div className="hoverIcon"><CellEditIcon row={params.row}/></div>
-          <div className="hoverIconSpacer"></div>
+          {isTurnEditable &&
+            <>
+              <div className="hoverIcon"><CellEditIcon row={params.row}/></div>
+              <div className="hoverIconSpacer"></div>
+            </>
+          }
         </div>,
     },
-    { field: 'detail', headerName: 'Fleet detail', width: 200,
+    { field: 'detail', headerName: 'Fleet detail', width: 250,
       renderCell: (params) => {
         if (params.row.type === 'unit') {
           let fleetStatus;
@@ -207,29 +220,33 @@ const Turn = () => {
             fleetStatus = '(no fleet)';
           }
           return <>
-            <Tooltip title="edit to change fleet">
+            <Tooltip title={isTurnEditable && "edit to change fleet"}>
               <div>
                 {fleetStatus}
               </div>
             </Tooltip>
-            <EditIcon
-              onClick={(e) => {
-                e.stopPropagation();
-                doEdit(params.row);
-              }}
-            />
+            {isTurnEditable &&
+              <EditIcon
+                onClick={(e) => {
+                  e.stopPropagation();
+                  doEdit(params.row);
+                }}
+              />
+            }
           </>;
         } else {
           return <>
             <Tooltip title={params.row.units.map((r) => r.name).join(", ")}>
-              <div>{params.row.units.length} unit{params.row.units.length != 1 && "(s)"}</div>
+              <div>{params.row.units.length} unit{params.row.units.length !== 1 && "(s)"}</div>
             </Tooltip>
-            <EditIcon
-              onClick={(e) => {
-                e.stopPropagation();
-                viewFleetDetail(params.row);
-              }}
-            />
+            {isTurnEditable &&
+              <EditIcon
+                onClick={(e) => {
+                  e.stopPropagation();
+                  viewFleetDetail(params.row);
+                }}
+              />
+            }
           </>;
         }
       },
@@ -239,6 +256,22 @@ const Turn = () => {
       },
     },
   ];
+
+  function doSubmitTurn() {
+    // eslint-disable-next-line no-restricted-globals
+    if (confirm(`Submit turn #${turnNum}? Turn cannot be changed after it is submitted.`)) {
+      console.log("Submitting turn");
+      updateDbData({
+        path: turnSubmissionPath(userId, turnNum)+'/submitted',
+        data: true,
+      })
+      .then(() => {
+        console.log("turn submitted!");
+        reloadData();
+      })
+      .catch((err) => console.log("Error submitting turn:", err));
+    }
+  }
 
   return (
     <Box className="Turn">
@@ -289,48 +322,21 @@ const Turn = () => {
         </Box>
       </Modal>
       <Typography variant="h6" component="h4">
-        Turn {turnNum}
+        Turn {turnNum} [{turnSubmitted ? 'SUBMITTED' : turnDetail?.public?.status}]
+        {isTurnEditable &&
+          <Button variant="contained" style={{marginLeft: '10px'}}
+            onClick={doSubmitTurn}
+          >Submit turn
+        </Button>}
       </Typography>
-      <DataGrid experimentalFeatures={{ newEditingApi: isTurnEditable }}
+      <DataGrid experimentalFeatures={{ newEditingApi: true }}
         columns={columns}
         rows={rows}
         getRowClassName={(params) => `type-${params.row.type}`}
+        isCellEditable={() => isTurnEditable}
         processRowUpdate={savePosition}
         onProcessRowUpdateError={(e) => console.log("Error updating:", e)}
       />
-
-      {/*
-      <List>
-        <ListItem disablePadding>
-          {isEditMode ?
-            <>
-              <TextField id="turnNum" label="Current turn number" variant="outlined"
-                value={turnNum}
-                onChange={e => setTurnNum(e.target.value)}
-                sx={{width: 500}}
-              />
-              <ListItemButton>
-                <Button onClick={() => {setEditMode(false);reloadData();}} startIcon={<CancelIcon/>}>Cancel</Button>
-              </ListItemButton>
-              <ListItemButton>
-                <Button onClick={saveCurrentTurn} startIcon={<CheckIcon/>}>Save</Button>
-              </ListItemButton>
-            </>
-          :
-            <>
-              <ListItemText primary={`Turn number: ${turnNum}`}/>
-              {userState?.admin &&
-                <ListItemButton>
-                  <ListItemIcon>
-                    <EditIcon onClick={() => setEditMode(true)}/>
-                  </ListItemIcon>
-                </ListItemButton>
-              }
-            </>
-          }
-        </ListItem>
-      </List>
-      */}
     </Box>
   )
 };
