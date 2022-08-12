@@ -13,7 +13,7 @@ import ListItemText from '@mui/material/ListItemText';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, useGridApiContext } from '@mui/x-data-grid';
 import { modalStyle } from '../lib/styles';
 import { getDbData, getNavyPath, saveShipMovement, turnSubmissionPath } from '../lib/myFireDB';
 import { useGameContext } from '../lib/GameContext';
@@ -23,6 +23,13 @@ const MODALMODE = {
   UNIT: 1,
   FLEET: 2,
 };
+
+const CellEditIcon = ({row}) => {
+  const apiRef = useGridApiContext();
+  return <EditIcon
+    onClick={() => apiRef.current.startCellEditMode({id: row.id, field: 'endingPosition'})}
+  />;
+}
 
 const Turn = () => {
   const {gameState} = useGameContext();
@@ -106,22 +113,7 @@ const Turn = () => {
     if (!gameState?.fleets?.[userId]) return;
     reloadData();
   }, [gameState?.fleets?.[userId]])
-  /*
-  function saveCurrentTurn() {
-    setEditMode(false);
-    set(ref(db, currentTurnPath), {
-      public: {
-        turnNum,
-      }
-    })
-    .then(() => {
-      toast.success("Successfully updated current turn.");
-    })
-    .catch((error) => {
-      console.log("Error updating currentTurn:", error);
-    });
-  }
-  */
+
   const closeModal = () => {
     setModalOpen(false);
   }
@@ -195,13 +187,11 @@ const Turn = () => {
     { field: 'startingPosition', headerName: 'Starting', width: 100 },
     { field: 'endingPosition', headerName: 'Ending', width: 100,
       editable: true,
-      renderCell: (params) => <Tooltip title="Double click to edit">
-        <div className="MuiDataGrid-cellContent">
+      renderCell: (params) => <div className="MuiDataGrid-cellContent">
           {params.row.endingPosition}
-          <div className="hoverIcon"><EditIcon/></div>
+          <div className="hoverIcon"><CellEditIcon row={params.row}/></div>
           <div className="hoverIconSpacer"></div>
-        </div>
-      </Tooltip>,
+        </div>,
     },
     { field: 'detail', headerName: 'Fleet detail', width: 200,
       renderCell: (params) => {
