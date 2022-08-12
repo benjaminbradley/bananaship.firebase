@@ -10,8 +10,14 @@ const app = initializeApp({
 });
 
 // set custom claims on user account, i.e. admin role
-const uid = 'USERID';
+//const uid = 'UID';
 getAuth()
-.setCustomUserClaims(uid, { admin: true })
-
+//.setCustomUserClaims(uid, { admin: true })
+.listUsers()
+.then((listUsersResult) => {
+  listUsersResult.users.forEach((userRecord) => {
+    console.log('user', userRecord.toJSON());
+  });
+})
+.catch((err) => console.log("Error:", err))
 console.log("did stuff");
