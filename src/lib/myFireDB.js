@@ -5,6 +5,24 @@ export const cleanEmail = (email) => {
   return email.toLowerCase().replaceAll('.', '_');
 };
 
+export async function getDbData({
+  path,
+  prepData = (d) => d,
+}) {
+  return get(child(ref(db), path)).then((snapshot) => {
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      if (data) {
+        const finalData = prepData(data);
+        return Promise.resolve(finalData);
+      }
+    }
+    return Promise.resolve(null);
+  }).catch((error) => {
+    return Promise.reject(error);
+  });
+}
+
 export const updateUser = ({
   user,
   userInfo,
@@ -54,6 +72,9 @@ export const deleteUser = ({
   });
 };
 
+
+export const getNavyPath = ({userId}) => `games/default/${userId}/navy`;
+
 export const saveUnit = ({
   userId,
   unitId,
@@ -61,7 +82,7 @@ export const saveUnit = ({
   onSuccess,
 } = {}) => {
   update(ref(db), {
-    [`/games/default/${userId}/navy/${unitId}`]: unitData,
+    [`/${getNavyPath({userId})}/${unitId}`]: unitData,
   })
   .then(() => {
     if (onSuccess) {
@@ -78,7 +99,7 @@ export const deleteUnit = ({
   unitId,
   onSuccess,
 } = {}) => {
-  remove(ref(db, `/games/default/${userId}/navy/${unitId}`))
+  remove(ref(db, `/${getNavyPath({userId})}/${unitId}`))
   .then(() => {
     if (onSuccess) {
       onSuccess();
@@ -89,7 +110,8 @@ export const deleteUnit = ({
   });
 };
 
-export const fleetsPath = ({email}) => `/games/default/${cleanEmail(email)}/fleets`;
+
+export const getFleetsPath = ({userId}) => `/games/default/${userId}/fleets`;
 
 export const getFleets = async ({
   email,
@@ -98,7 +120,7 @@ export const getFleets = async ({
   let prepData;
   if (email) {
     // single user
-    path = fleetsPath({email});
+    path = getFleetsPath({userId: cleanEmail(email)});
     prepData = (data) => {
       return {
         [cleanEmail(email)]: data
@@ -111,17 +133,9 @@ export const getFleets = async ({
       Object.fromEntries(Object.entries(data).map(([id,data]) => [id, data.fleets]));
     ;
   }
-  return get(child(ref(db), path)).then((snapshot) => {
-    if (snapshot.exists()) {
-      const data = snapshot.val();
-      if (data) {
-        const finalData = prepData(data);
-        return Promise.resolve(finalData);
-      }
-    }
-    return Promise.resolve([]);
-  }).catch((error) => {
-    return Promise.reject(error);
+  return getDbData({
+    path,
+    prepData,
   });
 }
 
@@ -142,5 +156,71 @@ export const saveFleet = ({
   })
   .catch((error) => {
     console.log("Error saving fleet:", error);
+  });
+};
+
+
+export const currentTurnPath = `/games/default/currentTurn`;
+
+export const getCurrentTurn = async ({
+  admin,
+} = {}) => {
+  let path;
+  let prepData;
+  if (admin) {
+    // single user
+    path = currentTurnPath;
+    prepData = (data) => data;
+  } else {
+    // all users (admin)
+    path = `${currentTurnPath}/public`;
+    prepData = (data) => ({
+      public: data,
+    });
+  }
+  return getDbData({
+    path,
+    prepData,
+  });
+};
+
+export const turnPath = (turnNum) => `/games/default/turns/${turnNum}`;
+export const publicTurnPath = (turnNum) => `${turnPath(turnNum)}/public`;
+
+export const getTurnDetail = async ({
+  admin,
+  turnNum,
+} = {}) => {
+  let path;
+  let prepData;
+  if (admin) {
+    path = turnPath(turnNum);
+    prepData = (data) => data;
+  } else {
+    // all users (admin)
+    path = publicTurnPath(turnNum);
+    prepData = (data) => ({
+      public: data,
+    });
+  }
+  return getDbData({
+    path,
+    prepData,
+  });
+};
+
+export const turnSubmissionPath = (userId, turnNum) => `${turnPath(turnNum)}/${userId}/submission`;
+
+export const saveShipMovement = ({
+  userId,
+  turnNum,
+  unitGuid,
+  moveInfo,
+} = {}) => {
+  update(ref(db), {
+    [`/games/default/turns/${turnNum}/${userId}/submission/shipMovements/${unitGuid}`]: moveInfo,
+  })
+  .catch((error) => {
+    console.log("Error updating user info:", error);
   });
 };

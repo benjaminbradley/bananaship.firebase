@@ -37,6 +37,16 @@
   }
 }
 
+.hoverIconSpacer {
+  width:1em;
+  height:1em;
+  display: inline-block;
+}
+.hoverIcon {
+  float:right;
+  height:0;
+}
+
 .MuiSvgIcon-root {
   margin: 0px 5px;
 }
@@ -87,8 +97,13 @@
 
 .DataManager,
 .Navy,
+.Turn,
 .Users {
   height: 500px;
   width: 850px;
   margin: 20px auto;
+}
+
+.type-fleet .MuiDataGrid-cell {
+  font-weight: bold;
 }

@@ -15,6 +15,9 @@ const UnitForm = ({
   formData,
   closeModal,
   onSuccess,
+  nameEditable = true,
+  showPosition = true,
+  overrideSaveUnit = null,
 } = {}) => {
   const {gameState} = useGameContext();
   const [name, setName] = useState(formData?.name);
@@ -30,7 +33,7 @@ const UnitForm = ({
     };
     if (fleetId !== '')
       unitData.fleetId = fleetId;
-    saveUnit({
+    const saveParams = {
       userId,
       unitId: formData?.id || uuid(),
       unitData,
@@ -39,7 +42,12 @@ const UnitForm = ({
         closeModal();
         onSuccess();
       },
-    });
+    };
+    if (overrideSaveUnit) {
+      overrideSaveUnit(saveParams);
+    } else {
+      saveUnit(saveParams);
+    }
   };
 
   return (
@@ -47,11 +55,14 @@ const UnitForm = ({
       <TextField id="name" label="Unit name" variant="outlined"
         value={name}
         onChange={e => setName(e.target.value)}
+        disabled={!nameEditable}
       />
-      <TextField id="position" label="Position" variant="outlined"
-        value={position}
-        onChange={e => setPosition(e.target.value)}
-      />
+      {showPosition &&
+        <TextField id="position" label="Position" variant="outlined"
+          value={position}
+          onChange={e => setPosition(e.target.value)}
+        />
+      }
       <FormControl fullWidth>
         <InputLabel id="fleet-select-label">Fleet</InputLabel>
         <Select id="fleet-select" label="Fleet" labelId="fleet-select-label"

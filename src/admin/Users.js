@@ -12,10 +12,10 @@ import IconButton from '@mui/material/IconButton';
 import Modal from '@mui/material/Modal';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-//import EditIcon from "@mui/icons-material/Edit";
+import WorkHistoryIcon from '@mui/icons-material/WorkHistory';
 import { DataGrid } from '@mui/x-data-grid';
 import { db } from '../lib/myFirebase';
-import { deleteUser } from '../lib/myFireDB';
+import { deleteUser, getCurrentTurn } from '../lib/myFireDB';
 import { modalStyle } from '../lib/styles';
 import UserForm from './UserForm';
 
@@ -30,7 +30,7 @@ const Users = () => {
   const [rows, setRows] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
-  console.log("modalStyle", modalStyle)
+  const [currentTurnNum, setcurrentTurnNum] = useState(null);
 
   const updateUsersFromData = (data) => {
     console.log("DEBUG: updateUsersFromData, got data", data);
@@ -68,6 +68,15 @@ const Users = () => {
         updateUsersFromData(data);
       }
     });
+    // get current turn number
+    getCurrentTurn()
+    .then((currentTurn) => {
+      if (currentTurn)
+        setcurrentTurnNum(currentTurn.public.turnNum);
+      else console.log("ERROR: no Current Turn data");
+    }).catch((error) => {
+      console.log("Error getting currentTurn", error);
+    });
   }, []);
 
   const closeModal = () => {
@@ -93,15 +102,15 @@ const Users = () => {
     { field: 'email', headerName: 'ID', width: 300 },
     { field: 'createdAt', headerName: 'User since', width: 200 },
     { field: 'lastLoginAt', headerName: 'Last login', width: 200 },
-    { field: 'operations', headerName: 'Operations', width: 200,
+    { field: 'operations', headerName: 'Operations', width: 250,
       renderCell: (params) => {
         return <>
-          <Tooltip title="Delete all of user's data">
+          <Tooltip title="Review user's turns">
             <IconButton onClick={(e) => {
               e.stopPropagation(); // don't select this row after clicking
-              doDeleteUser(params.id);
+              navigate(`/users/${params.id}/turn/${currentTurnNum}`)
             }}>
-              <DeleteIcon/>
+              <WorkHistoryIcon/>
             </IconButton>
           </Tooltip>
           <Tooltip title="Manage Navy">
@@ -118,6 +127,14 @@ const Users = () => {
                 navigate(`/users/${params.id}/fleets`)
             }}>
               <ConnectingAirportsIcon/>
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete all of user's data">
+            <IconButton onClick={(e) => {
+              e.stopPropagation(); // don't select this row after clicking
+              doDeleteUser(params.id);
+            }}>
+              <DeleteIcon/>
             </IconButton>
           </Tooltip>
         </>;

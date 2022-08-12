@@ -22,7 +22,32 @@
       "default": {
         "currentTurn": {
           "public": {
-            ".read": true
+            ".read": true,
+            "turnNum": {}
+          }
+        },
+        "turns": {
+          "$turnNum": {
+            "public": {
+              ".read": true,
+              "status": {}
+            },
+            "$email": {
+              "submission": {
+                ".read": "$email === auth.token.email.toLowerCase().replace('.', '_')",
+                ".write": "$email === auth.token.email.toLowerCase().replace('.', '_') && data.parent().parent().child('public').child('status').val() === 'OPEN' && data.child('submitted').val() != true",
+                "submitted": {},
+                "shipMovements": {
+                  "$unitGuid": {
+                    "name": {},
+                    "startingPosition": {},
+                    "endingPosition": {},
+                    "startingFleet": {},
+                    "endingFleet": {}
+                  }
+                }
+              }
+            }
           }
         },
         "$email": {

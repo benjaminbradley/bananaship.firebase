@@ -7,7 +7,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { useGameContext, refreshFleets } from '../lib/GameContext';
 import { useUserContext } from '../lib/UserContext';
-import { saveFleet } from '../lib/myFireDB';
+import { saveFleet, getFleetsPath } from '../lib/myFireDB';
 import DataManager from './DataManager';
 
 const FleetForm = ({
@@ -65,10 +65,6 @@ const ManageFleets = ({
 } = {}) => {
   const { userId } = useParams();
 
-  const dbPaths = {
-    list: `games/default/${userId}/fleets`,
-  }
-
   const convertDataToRows = (data) => {
     const rowData = [];
     for (const [unitGuid, unitData] of Object.entries(data)) {
@@ -94,7 +90,7 @@ const ManageFleets = ({
         rowType="fleet"
         getRowLabel={(row) => `fleet (${row.name})`}
         columns={columns}
-        dbPaths={dbPaths}
+        getDataPath={getFleetsPath({userId})}
         convertDataToRows={convertDataToRows}
         deleteRow={null}
         userId={userId}

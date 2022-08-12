@@ -16,7 +16,7 @@ import { modalStyle } from '../lib/styles';
 import { db } from '../lib/myFirebase';
 
 const DataManager = ({
-  dbPaths,
+  getDataPath,
   convertDataToRows,
   getRowLabel,
   rowType,
@@ -32,7 +32,7 @@ const DataManager = ({
 
   useEffect(() => {
     reloadData();
-    onValue(ref(db, dbPaths.list), (snapshot) => {
+    onValue(ref(db, getDataPath), (snapshot) => {
       const data = snapshot.val();
       if (data !== null) {
         const rowData = convertDataToRows(data);
@@ -42,7 +42,7 @@ const DataManager = ({
   }, [convertDataToRows]);
 
   const reloadData = () => {
-    get(child(ref(db), dbPaths.list)).then((snapshot) => {
+    get(child(ref(db), getDataPath)).then((snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
         if (data) {
@@ -50,10 +50,10 @@ const DataManager = ({
           setRows(rowData);
         }
       } else {
-        console.log(`No data available under ${dbPaths.list}`);
+        console.log(`No data available under ${getDataPath}`);
       }
     }).catch((error) => {
-      console.error(`Error reading data at ${dbPaths.list}:`, error);
+      console.error(`Error reading data at ${getDataPath}:`, error);
     });
   };
 

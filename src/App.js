@@ -16,9 +16,11 @@ import GameDetail from './admin/GameDetail';
 import Users from './admin/Users';
 import ManageNavy from './admin/ManageNavy';
 import ManageFleets from './admin/ManageFleets';
+import Turn from './admin/Turn';
 
 function Footer() {
-  return <div className='Footer'>This part will not react to firebase auth changes</div>;
+  // This part will not react to firebase auth changes
+  return '';
 }
 
 function App() {
@@ -38,6 +40,7 @@ function App() {
         <Route path='/home' element={<Home/>} />
         <Route path='/users/:userId/navy' element={<ManageNavy/>} />
         <Route path='/users/:userId/fleets' element={<ManageFleets/>} />
+        <Route path='/users/:userId/turn/:turnNum' element={<Turn/>} />
       </Routes>
       <Footer />
     </Box>
