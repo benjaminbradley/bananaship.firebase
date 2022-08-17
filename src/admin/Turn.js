@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import EditIcon from "@mui/icons-material/Edit";
@@ -13,6 +15,7 @@ import ListItemText from '@mui/material/ListItemText';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import WorkHistoryIcon from '@mui/icons-material/WorkHistory';
 import { DataGrid, useGridApiContext } from '@mui/x-data-grid';
 import { modalStyle } from '../lib/styles';
 import { getDbData, getNavyPath, saveShipMovement, turnSubmissionPath, getTurnDetail, updateDbData } from '../lib/myFireDB';
@@ -34,6 +37,7 @@ const CellEditIcon = ({row}) => {
 const Turn = () => {
   const {gameState} = useGameContext();
   const { userId, turnNum } = useParams();
+  const navigate = useNavigate();
   const [rows, setRows] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState(MODALMODE.UNIT);
@@ -123,7 +127,7 @@ const Turn = () => {
   useEffect(() => {
     if (!gameState?.fleets?.[userId]) return;
     reloadData();
-  }, [userId, gameState?.fleets?.[userId]])
+  }, [userId, turnDetail, gameState?.fleets?.[userId]])
 
   const closeModal = () => {
     setModalOpen(false);
@@ -272,7 +276,6 @@ const Turn = () => {
       .catch((err) => console.log("Error submitting turn:", err));
     }
   }
-
   return (
     <Box className="Turn">
       <Modal
@@ -322,12 +325,35 @@ const Turn = () => {
         </Box>
       </Modal>
       <Typography variant="h6" component="h4">
-        Turn {turnNum} [{turnSubmitted ? 'SUBMITTED' : turnDetail?.public?.status}]
+        {63 < turnNum &&
+          <ArrowBackIcon style={{verticalAlign: 'middle'}} className='iconButton'
+            onClick={() => navigate(`/users/${userId}/turn/${parseInt(turnNum)-1}`)}
+          />
+        }
+        Turn {turnNum}
+        {gameState?.currentTurnNum && turnNum < gameState?.currentTurnNum &&
+          <ArrowForwardIcon style={{verticalAlign: 'middle'}} className='iconButton'
+            onClick={() => navigate(`/users/${userId}/turn/${parseInt(turnNum)+1}`)}
+          />
+        }
+        {turnDetail?.public?.status &&
+          <span style={{padding: '0 10px'}}>
+            [{turnSubmitted ? 'SUBMITTED' : turnDetail?.public?.status}]
+          </span>
+        }
         {isTurnEditable &&
           <Button variant="contained" style={{marginLeft: '10px'}}
             onClick={doSubmitTurn}
           >Submit turn
         </Button>}
+        {gameState.currentTurnNum && parseInt(turnNum) !== parseInt(gameState.currentTurnNum) &&
+          <Tooltip title={'Go to current turn'}>
+            <Button variant="outlined" onClick={() => navigate(`/users/${userId}/turn/${gameState.currentTurnNum}`)}>
+              <WorkHistoryIcon/>
+              {gameState.currentTurnNum}
+            </Button>
+          </Tooltip>
+        }
       </Typography>
       <DataGrid experimentalFeatures={{ newEditingApi: true }}
         columns={columns}

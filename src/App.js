@@ -1,4 +1,4 @@
-import { React } from 'react';
+import { React, useEffect } from 'react';
 import {
   Routes,
   Route,
@@ -9,7 +9,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import Box from '@mui/material/Box';
 import './lib/myFirebase';
+import { getCurrentTurn } from './lib/myFireDB';
 import './App.css';
+import { useGameContext, setCurrentTurn } from './lib/GameContext';
 import {UserActions, UserCredsForm} from './components/UserCreds';
 import Home from './components/Home';
 import GameDetail from './admin/GameDetail';
@@ -24,6 +26,17 @@ function Footer() {
 }
 
 function App() {
+  const { gameDispatch } = useGameContext();
+  useEffect(() => {
+    // get current turn number
+    getCurrentTurn()
+    .then((currentTurn) => {
+      gameDispatch(setCurrentTurn(currentTurn.public.turnNum));
+    }).catch((error) => {
+      console.log("Error getting currentTurn", error);
+    });
+  }, []);
+
   return (
     <Box className="App">
       <UserActions />

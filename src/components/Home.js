@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
@@ -10,8 +9,9 @@ import ConnectingAirportsIcon from '@mui/icons-material/ConnectingAirports';
 import RocketIcon from '@mui/icons-material/Rocket';
 import WorkHistoryIcon from '@mui/icons-material/WorkHistory';
 import { useUserContext } from '../lib/UserContext';
-import { cleanEmail, getCurrentTurn } from '../lib/myFireDB';
+import { cleanEmail } from '../lib/myFireDB';
 import Motd from './Motd';
+import { useGameContext } from '../lib/GameContext';
 
 function MyListItem({path, label, icon}) {
   return <ListItem disablePadding>
@@ -28,18 +28,7 @@ function MyListItem({path, label, icon}) {
 
 const Home = () => {
   const { userState } = useUserContext();
-  const [currentTurnNum, setcurrentTurnNum] = useState(null);
-
-  useEffect(() => {
-    // get current turn number
-    getCurrentTurn()
-    .then((currentTurn) => {
-      setcurrentTurnNum(currentTurn.public.turnNum);
-    }).catch((error) => {
-      console.log("Error getting currentTurn", error);
-    });
-  }, []);
-
+  const { gameState } = useGameContext();
   return (
     <Box>
       <Motd/>
@@ -50,7 +39,7 @@ const Home = () => {
       }}>
       <List>
         <MyListItem
-          path={`/users/${cleanEmail(userState?.currentUser?.email || '')}/turn/${currentTurnNum}`}
+          path={`/users/${cleanEmail(userState?.currentUser?.email || '')}/turn/${gameState.currentTurnNum}`}
           label={'Current Turn'}
           icon={<WorkHistoryIcon/>}
         />

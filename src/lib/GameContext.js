@@ -4,17 +4,23 @@ import { getFleets } from '../lib/myFireDB';
 // Initial state
 const initialState = {
   fleets: {},
+  currentTurnNum: null,
 };
 
 export const GameContext = createContext();
 
 export const ACTIONS = {
   SETFLEETS:1,
+  SETCURRENTTURN:2,
 };
 
 // Action creators
 export function setFleets(fleets) {
   return { type: ACTIONS.SETFLEETS, fleets };
+}
+
+export function setCurrentTurn(turnNum) {
+  return { type: ACTIONS.SETCURRENTTURN, turnNum };
 }
 
 // Reducer
@@ -36,6 +42,8 @@ export const gameReducer = (state, action) => {
         // multiple entries, replace all
         return { ...state, fleets: action.fleets };
       }
+    case ACTIONS.SETCURRENTTURN:
+      return { ...state, currentTurnNum: action.turnNum };
     default:
       return state;
   }

@@ -47,6 +47,12 @@
   height:0;
 }
 
+.iconButton {
+  color: rgb(25, 118, 210);
+}
+.iconButton:hover {
+  cursor: pointer;
+}
 .MuiSvgIcon-root {
   margin: 0px 5px;
 }
