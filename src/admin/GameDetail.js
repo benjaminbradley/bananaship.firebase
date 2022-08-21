@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { set, ref, get, child } from 'firebase/database';
+import { set, ref } from 'firebase/database';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -27,6 +30,8 @@ const TURNSTATUS = {
 
 const GameDetail = () => {
   const { userState } = useUserContext();
+  const [isEditCTCMode, setEditCTCMode] = useState(false);
+  const [currentTurnNum, setCurrentTurnNum] = useState(null);
   const [isEditMode, setEditMode] = useState(false);
   const [turnNum, setTurnNum] = useState(null);
   const [turnStatus, setTurnStatus] = useState('');
@@ -34,8 +39,13 @@ const GameDetail = () => {
   function reloadCurrentTurn() {
     getCurrentTurn({admin: true})
     .then((currentTurn) => {
+      console.log(`DEBUG: currentTurn`, currentTurn)
+      console.log(`DEBUG: currentTurn.public.turnNum`, currentTurn.public.turnNum)
+      console.log(`DEBUG: parseInt(currentTurn.public.turnNum)`, parseInt(currentTurn.public.turnNum))
       if (currentTurn)
-        setTurnNum(currentTurn.public.turnNum);
+        setCurrentTurnNum(parseInt(currentTurn.public.turnNum));
+        if (!turnNum)
+          setTurnNum(parseInt(currentTurn.public.turnNum));
       else console.log("Warning: no currentTurn");
     }).catch((error) => {
       console.error('Error reading currentTurn:', error);
@@ -63,11 +73,11 @@ const GameDetail = () => {
   }, [turnNum]);
 
 
-  function saveCurrentTurn() {
-    setEditMode(false);
+  function saveCurrentTurn(newValue) {
+    setEditCTCMode(false);
     set(ref(db, currentTurnPath), {
       public: {
-        turnNum,
+        turnNum: newValue,
       }
     })
     .then(() => {
@@ -95,38 +105,71 @@ const GameDetail = () => {
 
   function cancelEdit() {
     setEditMode(false);
-    reloadCurrentTurn();
     reloadTurnDetail();
+  }
+
+  function cancelEditCTN() {
+    setEditCTCMode(false);
+    reloadCurrentTurn();
+  }
+
+  function advanceTurn() {
+    const newTurnNum = parseInt(currentTurnNum)+1;
+    // eslint-disable-next-line no-restricted-globals
+    if (confirm(`Change current turn number to ${newTurnNum}?`)) {
+      saveCurrentTurn(newTurnNum);
+      setCurrentTurnNum(newTurnNum);
+      setTurnNum(newTurnNum);
+    }
   }
 
   return (
     <Box className="GameDetail">
-      <Typography variant="h6" component="h4">
-        Current game state
+      <Typography variant="h6" component="h1">
+
+        {isEditCTCMode ?
+          <>
+            <TextField id="turnNum" label="Current turn number" variant="outlined"
+              value={currentTurnNum}
+              onChange={e => setCurrentTurnNum(e.target.value)}
+              sx={{width: 500}}
+            />
+            <Button onClick={cancelEditCTN} startIcon={<CancelIcon/>}>Cancel</Button>
+            <Button onClick={() => saveCurrentTurn(currentTurnNum)} startIcon={<CheckIcon/>}>Save</Button>
+          </>
+        :
+          <>
+            Current turn number: {currentTurnNum}
+            <EditIcon onClick={() => setEditCTCMode(true)} className="iconButton"/>
+            <Button onClick={advanceTurn} startIcon={<AddCircleOutlineIcon/>}>Next turn</Button>
+          </>
+        }
+      </Typography>
+      <Divider /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/ />
+      <Typography variant="h6" component="h1">
+        Game state:
+        <ArrowBackIcon style={{verticalAlign: 'middle'}} className='iconButton'
+            onClick={() => setTurnNum(turnNum-1)}
+          />
+        Turn {turnNum}
+        {currentTurnNum && turnNum < currentTurnNum &&
+          <ArrowForwardIcon style={{verticalAlign: 'middle'}} className='iconButton'
+            onClick={() => setTurnNum(turnNum+1)}
+          />
+        }
+      </Typography>
+      <Box>
         {isEditMode ?
           <>
             <Button onClick={cancelEdit} startIcon={<CancelIcon/>}>Cancel</Button>
-            <Button onClick={() => {saveCurrentTurn(); //TODO: break up, turn switcher vs editing turn detail
-              saveTurnDetail();}} startIcon={<CheckIcon/>}>Save</Button>
+            <Button onClick={saveTurnDetail} startIcon={<CheckIcon/>}>Save</Button>
           </>
         :
           userState?.admin &&
-            <EditIcon onClick={() => setEditMode(true)}/>
+            <Button onClick={() => setEditMode(true)} startIcon={<EditIcon/>}>Edit turn details</Button>
         }
-      </Typography>
+      </Box>
       <List>
-        <ListItem disablePadding>
-          {isEditMode ?
-            <TextField id="turnNum" label="Current turn number" variant="outlined"
-              value={turnNum}
-              onChange={e => setTurnNum(e.target.value)}
-              sx={{width: 500}}
-            />
-          :
-            <ListItemText primary={`Turn number: ${turnNum}`}/>
-          }
-        </ListItem>
-        <Divider component="li" />
         <ListItem disablePadding>
           <ListItemText primary={`Details for turn number: ${turnNum}`}/>
         </ListItem>
